@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Crop Recommendation System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f4f4f4;
+        }
+        h1 {
+            color: mediumseagreen;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .result-card {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .result-card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .btn-primary {
+            background-color: mediumseagreen;
+            border: none;
+        }
+        footer {
+            background-color: #3CB371;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+            margin-top: 25px;
+        }
+
+        footer p {
+            font-size: 19px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .btn-primary:hover {
+            background-color: darkgreen;
+        }
+        .search-results-frame {
+            display: none; /* Hidden initially */
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .search-header {
+            background: mediumseagreen;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .search-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .search-item h6 {
+            color: mediumseagreen;
+            font-weight: bold;
+        }
+        .search-item p {
+            color: #555;
+        }
+
+        /* about.css */
+        #aboutSection {
+            display: none; /* Hidden by default */
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            max-width: 1140px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .search-header {
+            background: mediumseagreen;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        #cropList {
+            list-style-type: none;
+            padding: 0;
+        }
+        #cropList li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            font-size: 16px;
+        }
+        #cropList li strong {
+            color: mediumseagreen;
+        }
+        .info-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        /* Contact Section */
+        #contactSection {
+            display: none; /* Hidden initially */
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            max-width: 1140px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+        #contactSection .search-header {
+            background: mediumseagreen;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        #contactSection p {
+            font-size: 16px;
+            color: #333;
+            margin: 10px 0;
+        }
+        
+        #contactSection p strong {
+            color: mediumseagreen;
+        }
+        
+        #contactSection .btn-danger {
+            background-color: crimson;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        
+        #contactSection .btn-danger:hover {
+            background-color: darkred;
+        }
+        
+    </style>
+</head>
+<body style="background:#BCBBB8">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Crop Recommendation 🌱</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">home</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="toggleContact()">Contact</a>
+                    </li>
+                    
+
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="toggleAbout()">About</a>
+                    </li>
+
+                </ul>
+
+                <form class="d-flex position-relative" role="search">
+                    <input class="form-control me-2" type="search" id="searchBar" placeholder="Search for crops" aria-label="Search" onkeyup="filterCrops()">
+                    <button class="btn btn-outline-success" type="button">Search</button>
+                </form>
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Results Frame -->
+    <div id="searchResultsFrame" class="container mt-3 search-results-frame">
+        <h4 class="search-header">Search Results</h4>
+        <div id="searchResults" class="p-3"></div>
+    </div>
+
+    <script>
+        const crops = {
+            "Rice": "Rice is a staple food crop grown in flooded fields known as paddies. It requires high humidity, warm temperatures, and abundant water. It thrives in clayey or loamy soils with good water retention.",
+            "Maize":"Maize, also known as corn, is a cereal grain that grows well in well-drained soils with moderate rainfall. It requires warm temperatures and sunlight for optimal growth.",
+            "Jute":"Jute is a fiber crop cultivated in warm and humid climates, primarily used for making bags, ropes, and textiles. It requires alluvial or loamy soil with good drainage.",
+            "Cotton":"Cotton is a soft fiber crop that needs a long frost-free growing season and moderate rainfall. It grows best in well-drained loamy or clayey soils.",
+            "Coconut":"Coconut trees thrive in tropical coastal regions with sandy, well-drained soils and high humidity. They require a warm climate and regular watering.",
+            "Papaya":"Papaya is a tropical fruit tree that requires warm temperatures and well-drained soil. It grows quickly and produces fruit year-round.",
+            "Orange":"Oranges are citrus fruits that thrive in warm, well-drained soils. They require adequate sunlight and regular watering.",
+            "Apple":"Apples require a cool climate with sufficient chilling hours to set fruit. They grow best in well-drained loamy soil.",
+            "Muskmelon":"Muskmelon is a warm-season fruit that grows best in sandy loam soil with proper drainage and ample sunlight.",
+            "Watermelon":"Watermelon is a summer fruit that requires sandy, well-drained soil and ample sunlight. It thrives in warm temperatures.",
+            "Grapes":"Grapes are cultivated in temperate climates and require well-structured soil, proper trellising, and pruning.",
+            "Mango":"Mango trees thrive in tropical climates with deep, well-drained soil. They require dry winters for better fruiting.",
+            "Banana":"Bananas require warm temperatures, high humidity, and loamy soil with good drainage.",
+            "Pomegranate":"Pomegranates are drought-tolerant fruit crops that thrive in arid and semi-arid regions.",
+            "Lentil":"Lentils are cool-season legume crops requiring well-drained soil.",
+            "Blackgram":"Blackgram is a warm-season legume crop requiring moderate rainfall.",
+            "Mungbean":"Mungbean is a short-duration legume crop that grows well in sandy loam soil and warm climates. It is highly nutritious and commonly used in sprouting.",
+            "Mothbeans":"Mothbean is a drought-resistant legume crop grown in arid and semi-arid regions. It has excellent soil-binding properties and is a good fodder source.",
+            "Pigeonpeas":"Pigeonpea is a hardy legume crop that can withstand drought conditions. It is rich in protein and widely used in traditional dishes.",
+            "Kidneybeans":"Kidney beans require well-drained loamy soil with good moisture retention. They are a high-protein crop and widely consumed as a staple food.",
+            "Chickpea":"Chickpea is a cool-season legume that grows well in semi-arid regions with well-drained soil. It is an essential source of protein and fiber.",
+            "Coffee":"Coffee is a tropical crop grown in high-altitude regions with well-drained soil. It requires consistent rainfall and shade management.",
+
+        };
+
+        function filterCrops() {
+            let input = document.getElementById("searchBar").value.toLowerCase();
+            let resultsDiv = document.getElementById("searchResults");
+            let resultsFrame = document.getElementById("searchResultsFrame");
+        
+            resultsDiv.innerHTML = ""; // Clear previous results
+        
+            if (input.trim().length === 0) {
+                resultsFrame.style.display = "none"; // Hide results frame when input is empty
+                return;
+            }
+        
+            let filteredCrops = Object.keys(crops).filter(crop => crop.toLowerCase().includes(input));
+        
+            if (filteredCrops.length > 0) {
+                resultsFrame.style.display = "block"; // Show results frame
+        
+                filteredCrops.forEach(crop => {
+                    let div = document.createElement("div");
+                    div.classList.add("search-item");
+        
+                    div.innerHTML = `
+                        <h6>${crop}</h6>
+                        <p>${crops[crop]}</p>
+                    `;
+        
+                    resultsDiv.appendChild(div);
+                });
+            } else {
+                resultsFrame.style.display = "block";
+                resultsDiv.innerHTML = `<p class="text-danger">No crops found</p>`;
+            }
+        }
+
+        // Hide results when search input is cleared
+        document.getElementById("searchBar").addEventListener("input", function() {
+            if (this.value.trim() === "") {
+                document.getElementById("searchResultsFrame").style.display = "none";
+            }
+        });
+        
+    </script>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1>Crop Recommendation System</h1>
+
+        <form action="/predict" method="POST">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="Nitrogen" class="form-label">Nitrogen</label>
+                    <input type="number" id="Nitrogen" name="Nitrogen" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="Phosphorus" class="form-label">Phosphorus</label>
+                    <input type="number" id="Phosphorus" name="Phosphorus" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="Potassium" class="form-label">Potassium</label>
+                    <input type="number" id="Potassium" name="Potassium" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label for="Temperature" class="form-label">Temperature (°C)</label>
+                    <input type="number" step="0.01" id="Temperature" name="Temperature" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="Humidity" class="form-label">Humidity (%)</label>
+                    <input type="number" step="0.01" id="Humidity" name="Humidity" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="pH" class="form-label">pH Level</label>
+                    <input type="number" step="0.01" id="Ph" name="Ph" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label for="Rainfall" class="form-label">Rainfall (mm)</label>
+                    <input type="number" step="0.01" id="Rainfall" name="Rainfall" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Get Recommendation</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Result Display -->
+        {% if result %}
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Recommended Crop</h5>
+                        <p class="card-text">{{ result }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Crop Description</h5>
+                        <p class="card-text">{{ description }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-warning text-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">Recommended Pesticides</h5>
+                        <ul>
+                            {% for pesticide in pesticides %}
+                            <li>{{ pesticide }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <div id="aboutSection" class="container search-results-frame" style="display: none;">
+        <h4 class="search-header">About the Crop Recommendation System</h4>
+        
+        <div class="p-3">
+
+            <h5>🌱 Crop Recommendation System:</h5>
+            <p>A **Crop Recommendation System (CRS)** is a machine learning-based application designed to help farmers and agricultural stakeholders 
+                select the most suitable crop for cultivation based on various environmental and soil conditions. It utilizes data such as soil 
+                nutrients, pH levels, temperature, rainfall, and other climatic factors to provide precise recommendations, optimizing crop yield, 
+                improving soil health, and enhancing overall agricultural productivity. However, CRS faces several challenges, including data 
+                availability and quality, as inconsistent or missing data can affect accuracy, and variability in environmental conditions due to 
+                climate change can impact reliability. Additionally, farmer awareness and adoption remain a concern, especially in rural areas 
+                where technical knowledge may be limited. Regional and crop-specific variations make it difficult to develop a universally 
+                applicable model, while the integration of IoT and remote sensing, despite improving accuracy, remains costly and requires 
+                maintenance. Computational complexity also poses a challenge, as some machine learning models require significant processing power, 
+                making real-time predictions difficult in resource-limited environments. Despite these challenges, CRS has multiple applications 
+                in modern agriculture, such as precision farming to optimize crop selection, sustainable agriculture to promote responsible land 
+                use, and decision support for policymakers to enhance agricultural policies. It also aids farm advisory services in providing 
+                personalized recommendations, integrates with smart irrigation and fertilization systems for optimal resource use, and supports 
+                market-oriented farming by helping farmers choose crops with high demand and profitability. By addressing these challenges and 
+                improving system accuracy, CRS has the potential to revolutionize agriculture, making farming more efficient, sustainable, and 
+                profitable.</p>
+
+            <h5>Crop List & Descriptions:</h5>
+            <ul id="cropList"></ul>
+
+            <button class="btn btn-danger mt-3" onclick="toggleAbout()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleAbout() {
+            let aboutSection = document.getElementById("aboutSection");
+            let cropList = document.getElementById("cropList");
+        
+            if (aboutSection.style.display === "none") {
+                aboutSection.style.display = "block";
+                cropList.innerHTML = "";
+        
+                // Dynamically populate the crop list
+                Object.keys(crops).forEach(crop => {
+                    let li = document.createElement("li");
+                    li.innerHTML = `<strong>${crop}:</strong> ${crops[crop]}`;
+                    cropList.appendChild(li);
+                });
+        
+                // Scroll smoothly to the about section
+                aboutSection.scrollIntoView({ behavior: "smooth", block: "start" });
+            } else {
+                aboutSection.style.display = "none";
+            }
+        }
+    </script>
+
+    <!-- Contact Section -->
+    <div id="contactSection" class="container search-results-frame" style="display: none;">
+        <h4 class="search-header">📞 Contact Us</h4>
+        
+        <div class="p-3">
+            <p><strong>📍 Address:</strong> Agaram Main Road, Selaiyur, Tambaram, Chennai, 600073</p>
+            <p><strong>📧 Email:</strong> croprecommender@gmail.com</p>
+            <p><strong>📞 Phone:</strong> 9846369467, 9870567429</p>
+            <p><strong>💬 Customer Support:</strong> Available 24/7</p>
+            
+            <button class="btn btn-danger mt-3" onclick="toggleContact()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleContact() {
+            let contactSection = document.getElementById("contactSection");
+            
+            if (contactSection.style.display === "none") {
+                contactSection.style.display = "block";
+                contactSection.scrollIntoView({ behavior: "smooth", block: "start" });
+            } else {
+                contactSection.style.display = "none";
+            }
+        }
+    </script>
+    
+
+
+    <footer>
+        <div class="bottom-bar">
+            <p>&copy; 2025 Crop Recommendation System . All rights reserved</p>
+        </div>
+
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
